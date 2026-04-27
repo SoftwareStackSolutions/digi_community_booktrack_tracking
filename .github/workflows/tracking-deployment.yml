@@ -92,48 +92,48 @@ jobs:
           git commit -m "Add Tracking Artifact ${{ steps.version.outputs.version }}"
           git push origin main
 
-  Container-Build-and-Publish:
-    name: Build & Push Docker Image
-    runs-on: ubuntu-latest
-    needs: build-and-publish-artifact
+  # Container-Build-and-Publish:
+  #   name: Build & Push Docker Image
+  #   runs-on: ubuntu-latest
+  #   needs: build-and-publish-artifact
 
-    steps:
-      - name: Checkout main repo
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout main repo
+  #       uses: actions/checkout@v4
 
-      - name: Checkout artifact repo
-        uses: actions/checkout@v4
-        with:
-          repository: SoftwareStackSolutions/digi_community_booktrack_artifact
-          token: ${{ secrets.MY_GITHUB_TOKEN }}
-          path: artifact-repo
+  #     - name: Checkout artifact repo
+  #       uses: actions/checkout@v4
+  #       with:
+  #         repository: SoftwareStackSolutions/digi_community_booktrack_artifact
+  #         token: ${{ secrets.MY_GITHUB_TOKEN }}
+  #         path: artifact-repo
 
-      - name: Copy latest artifact
-        run: |
-          cp artifact-repo/Tracking/Tracking-latest.zip ./artifact.zip
+  #     - name: Copy latest artifact
+  #       run: |
+  #         cp artifact-repo/Tracking/Tracking-latest.zip ./artifact.zip
 
-      - name: Extract artifact
-        run: |
-          mkdir app
-          unzip artifact.zip -d app
+  #     - name: Extract artifact
+  #       run: |
+  #         mkdir app
+  #         unzip artifact.zip -d app
 
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.MY_GITHUB_TOKEN }}
+  #     - name: Login to GHCR
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.MY_GITHUB_TOKEN }}
 
-      - name: Build Docker image
-        run: |
-          docker build -t python-application:latest ./app
+  #     - name: Build Docker image
+  #       run: |
+  #         docker build -t python-application:latest ./app
 
-      - name: Tag image
-        run: |
-          OWNER=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
-          docker tag python-application:latest ghcr.io/$OWNER/python-application:latest
+  #     - name: Tag image
+  #       run: |
+  #         OWNER=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
+  #         docker tag python-application:latest ghcr.io/$OWNER/python-application:latest
 
-      - name: Push image
-        run: |
-          OWNER=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
-          docker push ghcr.io/$OWNER/python-application:latest
+  #     - name: Push image
+  #       run: |
+  #         OWNER=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
+  #         docker push ghcr.io/$OWNER/python-application:latest
