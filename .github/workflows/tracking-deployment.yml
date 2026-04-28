@@ -165,7 +165,7 @@ jobs:
       # ✅ Connect to EKS
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --region us-east-1 --name eks-dev-1-0-2
+          aws eks update-kubeconfig --region us-east-1 --name eks-dev-1-0-3
 
       # ✅ Deploy manifests
       - name: Deploy to cluster
