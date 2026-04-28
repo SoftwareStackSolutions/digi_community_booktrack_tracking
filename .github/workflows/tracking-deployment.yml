@@ -170,6 +170,8 @@ jobs:
       # ✅ Deploy manifests
       - name: Deploy to cluster
         run: |
+          kubectl apply -f namespace.yaml
+          kubectl apply -f secrets.yaml
           kubectl apply -f tracking-deployment.yaml
           kubectl apply -f tracking-service.yaml
 
