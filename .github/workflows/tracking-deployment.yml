@@ -179,4 +179,4 @@ jobs:
       # ✅ Force new image pull
       - name: Restart deployment
         run: |
-          kubectl rollout restart deployment tracking-app -n tracking
+          kubectl rollout restart deployment -n tracking-app
