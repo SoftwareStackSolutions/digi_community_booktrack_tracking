@@ -171,6 +171,7 @@ jobs:
       - name: Deploy to cluster
         run: |
           kubectl apply -f namespace.yaml
+          kubectl apply -f aws-auth.yaml
           kubectl apply -f secrets.yaml
           kubectl apply -f tracking-deployment.yaml
           kubectl apply -f tracking-service.yaml
