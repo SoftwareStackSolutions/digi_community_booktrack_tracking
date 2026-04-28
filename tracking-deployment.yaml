@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracking-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tracking-app
+  template:
+    metadata:
+      labels:
+        app: tracking-app
+    spec:
+      containers:
+        - name: tracking-app
+          image: ghcr.io/SoftwareStackSolutions/tracking-application:latest
+          ports:
+            - containerPort: 8000
