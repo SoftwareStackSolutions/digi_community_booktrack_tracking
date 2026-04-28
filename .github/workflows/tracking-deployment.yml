@@ -170,8 +170,8 @@ jobs:
       # ✅ Deploy manifests
       - name: Deploy to cluster
         run: |
-          kubectl apply -f k8s/tracking-deployment.yaml
-          kubectl apply -f k8s/tracking-service.yaml
+          kubectl apply -f tracking-deployment.yaml
+          kubectl apply -f tracking-service.yaml
 
       # ✅ Force new image pull
       - name: Restart deployment
