@@ -82,6 +82,19 @@ jobs:
           mv tracking-package.zip artifact-repo/Tracking/Tracking-${VERSION}.zip
           cp artifact-repo/Tracking/Tracking-${VERSION}.zip artifact-repo/Tracking/Tracking-latest.zip
 
+      - name: Cleanup old artifacts (keep last 5)
+        if: steps.hash.outputs.no_change == 'false'
+        run: |
+          cd artifact-repo/Tracking
+
+          echo "Before cleanup:"
+          ls -1 Tracking-v*.zip || true
+
+          ls -1 Tracking-v*.zip 2>/dev/null | sort -V | head -n -5 | xargs -r rm -f
+
+          echo "After cleanup:"
+          ls -1 Tracking-v*.zip || true
+          
       - name: Commit & Push
         if: steps.hash.outputs.no_change == 'false'
         run: |
