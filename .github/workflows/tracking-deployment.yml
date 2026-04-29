@@ -143,31 +143,32 @@ jobs:
     name: Deploy to EKS
     runs-on: ubuntu-latest
     needs: Container-Build-and-Publish
-
+  
     permissions:
-      id-token: write   # ✅ REQUIRED for OIDC
+      id-token: write
       contents: read
-
+  
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      # ✅ OIDC Authentication
+  
+      # ✅ Use Org Secrets here
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: us-east-1
-
+          aws-region: ${{ secrets.AWS_REGION }}
+  
       - name: Install kubectl
         uses: azure/setup-kubectl@v4
-
-      # ✅ Connect to EKS
+  
+      # ✅ Use cluster + region from secrets
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --region us-east-1 --name eks-dev-1-0-3
-
-      # ✅ Deploy manifests
+          aws eks update-kubeconfig \
+            --region ${{ secrets.AWS_REGION }} \
+            --name ${{ secrets.EKS_CLUSTER_NAME }}
+  
       - name: Deploy to cluster
         run: |
           kubectl apply -f namespace.yaml
@@ -175,8 +176,7 @@ jobs:
           kubectl apply -f secrets.yaml
           kubectl apply -f tracking-deployment.yaml
           kubectl apply -f tracking-service.yaml
-
-      # ✅ Force new image pull
+  
       - name: Restart deployment
         run: |
           kubectl rollout restart deployment -n tracking-app
