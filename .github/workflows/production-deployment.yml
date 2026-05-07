@@ -1,0 +1,76 @@
+name: Production Deployment Pipeline
+
+on:
+  push:
+    branches:
+      - production
+jobs:
+
+# -----------------------------------------
+# DEPLOY TO PRODUCTION EKS
+# -----------------------------------------
+  deploy-to-production:
+    name: Deploy to Production EKS
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+
+      # CHECKOUT REPOSITORY
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # AWS LOGIN
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.PROD_AWS_REGION }}
+
+      # ACCOUNT ID
+      - name: Get AWS Account ID
+        id: aws_account
+        run: |
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+
+          echo "account_id=$ACCOUNT_ID" >> $GITHUB_OUTPUT
+
+      # UPDATE KUBECONFIG
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region ${{ secrets.PROD_AWS_REGION }} \
+            --name ${{ secrets.PROD_EKS_CLUSTER_NAME }}
+
+      # DEPLOY TO EKS
+      - name: Deploy Application
+        run: |
+
+          ACCOUNT_ID=${{ steps.aws_account.outputs.account_id }}
+
+          REGION=${{ secrets.PROD_AWS_REGION }}
+
+          IMAGE=$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/tracking-app:latest
+
+          echo "Deploying image: $IMAGE"
+
+          kubectl apply -f secrets.yaml
+
+          kubectl apply -f tracking-deployment.yaml
+
+          kubectl apply -f tracking-service.yaml
+
+          kubectl set image deployment/tracking-service \
+            tracking-service=$IMAGE \
+            -n tracking-app
+
+          kubectl rollout status deployment/tracking-service -n tracking-app
+
+      # VERIFY
+      - name: Verify Pods
+        run: |
+          kubectl get pods -n tracking-app
