@@ -176,7 +176,7 @@ jobs:
 
           REGION=${{ secrets.AWS_REGION }}
 
-          ECR_URI=$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/auth-app
+          ECR_URI=$ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/tracking-app
 
           docker tag tracking-app:latest $ECR_URI:$VERSION
           docker tag tracking-app:latest $ECR_URI:latest
