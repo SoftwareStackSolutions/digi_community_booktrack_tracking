@@ -13,14 +13,15 @@ spec:
       labels:
         app: tracking-service
     spec:
-      imagePullSecrets:
-        - name: ghcr-secret   # 👈 REQUIRED
+      # imagePullSecrets:
+      #   - name: ghcr-secret   # 👈 REQUIRED
       containers:
         - name: tracking-service
-          image: ghcr.io/softwarestacksolutions/tracking-application:latest
+          image: nginx:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8004
+              protocol: TCP
           env:
             - name: POSTGRES_DB
               valueFrom:
